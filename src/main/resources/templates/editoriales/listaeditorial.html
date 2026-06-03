@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Editoriales</title>
+</head>
+<body>
+<div class="container mt-5">
+
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Editoriales</h4>
+
+            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalNuevo">
+                Nueva Editorial
+            </button>
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+
+                <tbody id = "tableEditoriales">
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modalNuevo" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form th:action="@{/editoriales/save}" method="post">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Nueva Editorial</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <label class="form-label">Nombre Editorial</label>
+                    <input type="text"
+                           name="nombre"
+                           class="form-control"
+                           placeholder="Ingrese el titulo" id="titulo" pattern="[A-Za-z]+" required>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Direccion</label>
+                    <input type="text"
+                           name="direccion"
+                           class="form-control"
+                           placeholder="Ingrese una direccion" id="direccion" pattern="[A-Za-z]" required>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Teléfono</label>
+                    <input type="number"
+                           name="telefono"
+                           class="form-control"
+                           placeholder="Ingrese un telefono" id="telefono" pattern="[0-9]{9}+" required>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+<div th:each="edit : ${edits}">
+
+    <div class="modal fade" th:id="'modalEditar' + ${edits.id}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <form th:action="@{/editoriales/save}" method="post">
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title">Editar Editorial</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <input type="hidden" name="id" th:value="${edits.id}">
+
+                        <label class="form-label">Nombre</label>
+                        <input type="text"
+                               name="nombre"
+                               class="form-control"
+                               th:value="${edits.nombre_edi}"
+                               required>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-warning">
+                            Actualizar
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" th:id="'modalEliminar' + ${edits.id}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Eliminar Editorial</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p>
+                        ¿Está seguro de eliminar la editorial?
+                        <strong th:text="${edits.nombre}"></strong>?
+                    </p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <a class="btn btn-danger"
+                       th:href="@{/editoriales/eliminar/{id}(id=${edits.id})}">
+                        Sí, eliminar
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded",function(){
+        listarEditoriales();
+    });
+    function listarEditoriales(){
+        fetch('/editoriales/listaeditoriales').then(response => response.json()).then(response => {
+            let table = document.getElementById('tableEditoriales');
+            //table.innerHTML=``;
+            //<td>${libro.editorial}</td>
+            response.data.forEach(editoriales => {
+                table.innerHTML += `
+                <tr>
+                    <td>${editoriales.id}</td>
+                    <td>${editoriales.nombre}</td>
+                    <td>${editoriales.direccion}</td>
+                    <td>${editoriales.telefono}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="editCategoria(${editoriales.id})">EDITAR</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCategoria(${editoriales.id})">ELIMINAR</button>
+                    </td>
+                `;
+            })
+        })
+    }
+    function abrirModal(){
+        limpiarFormulario();
+        document.getElementById(`tituloModal`).innerText=`Nueva Editorial`;
+    }
+    function limpiarFormulario(){
+        document.getElementById(`id`).value = ``;
+        document.getElementById(`nombre`).value = ``;
+        document.getElementById(`direccion`).value = ``;
+        document.getElementById(`telefono`).value = ``;
+        limpiarErrores();
+    }
+</script>
+</body>
+</html>
