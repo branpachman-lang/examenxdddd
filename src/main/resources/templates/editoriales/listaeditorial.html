@@ -3,194 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <title>Editoriales</title>
+    <link rel="stylesheet" th:href="@{/estilos.css}">
 </head>
 <body>
-<div class="container mt-5">
 
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Editoriales</h4>
-
-            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalNuevo">
-                Nueva Editorial
-            </button>
-        </div>
-
-        <div class="card-body">
-
-            <table class="table table-bordered table-hover align-middle">
-                <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Dirección</th>
-                    <th>Teléfono</th>
-                    <th>Acciones</th>
-                </tr>
-                </thead>
-
-                <tbody id = "tableEditoriales">
-
-                </tbody>
-            </table>
-
-        </div>
+<nav class="barra-navegacion">
+    <a href="/" class="titulo-logo">Biblioteca</a>
+    <div>
+        <a href="/">Inicio</a>
+        <a href="/editoriales">Editoriales</a>
+        <a href="/libros">Libros</a>
     </div>
+</nav>
+
+<div class="contenedor">
+    <div class="cabecera-seccion">
+        <h2>Lista de Editoriales</h2>
+        <button class="boton boton-verde" onclick="abrirModal()">+ Nueva Editorial</button>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Dirección</th>
+            <th>Teléfono</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody id="tabla-editoriales"></tbody>
+    </table>
 </div>
 
-
-<div class="modal fade" id="modalNuevo" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <form th:action="@{/editoriales/save}" method="post">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">Nueva Editorial</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body">
-                    <label class="form-label">Nombre Editorial</label>
-                    <input type="text"
-                           name="nombre"
-                           class="form-control"
-                           placeholder="Ingrese el titulo" id="titulo" pattern="[A-Za-z]+" required>
-                </div>
-                <div class="modal-body">
-                    <label class="form-label">Direccion</label>
-                    <input type="text"
-                           name="direccion"
-                           class="form-control"
-                           placeholder="Ingrese una direccion" id="direccion" pattern="[A-Za-z]" required>
-                </div>
-                <div class="modal-body">
-                    <label class="form-label">Teléfono</label>
-                    <input type="number"
-                           name="telefono"
-                           class="form-control"
-                           placeholder="Ingrese un telefono" id="telefono" pattern="[0-9]{9}+" required>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Cancelar
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        Guardar
-                    </button>
-                </div>
-            </form>
-
+<div class="fondo-modal" id="modal-editorial">
+    <div class="caja-modal">
+        <div class="cabecera-modal">
+            <h3 id="titulo-modal">Nueva Editorial</h3>
+            <button class="boton-cerrar" onclick="cerrarModal()">X</button>
         </div>
-    </div>
-</div>
 
+        <form id="form-editorial">
+            <input type="hidden" id="id-editorial">
 
-<div th:each="edit : ${edits}">
-
-    <div class="modal fade" th:id="'modalEditar' + ${edits.id}" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-
-                <form th:action="@{/editoriales/save}" method="post">
-                    <div class="modal-header bg-warning">
-                        <h5 class="modal-title">Editar Editorial</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <input type="hidden" name="id" th:value="${edits.id}">
-
-                        <label class="form-label">Nombre</label>
-                        <input type="text"
-                               name="nombre"
-                               class="form-control"
-                               th:value="${edits.nombre_edi}"
-                               required>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Cancelar
-                        </button>
-                        <button type="submit" class="btn btn-warning">
-                            Actualizar
-                        </button>
-                    </div>
-                </form>
-
+            <div class="grupo-campo">
+                <label>Nombre</label>
+                <input type="text" id="nombre">
+                <span id="error-nombre" style="color: #dc3545; font-size: 12px; display: none; margin-top: 5px;"></span>
             </div>
-        </div>
-    </div>
 
-    <div class="modal fade" th:id="'modalEliminar' + ${edits.id}" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">Eliminar Editorial</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body">
-                    <p>
-                        ¿Está seguro de eliminar la editorial?
-                        <strong th:text="${edits.nombre}"></strong>?
-                    </p>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Cancelar
-                    </button>
-
-                    <a class="btn btn-danger"
-                       th:href="@{/editoriales/eliminar/{id}(id=${edits.id})}">
-                        Sí, eliminar
-                    </a>
-                </div>
-
+            <div class="grupo-campo">
+                <label>Dirección</label>
+                <input type="text" id="direccion">
+                <span id="error-direccion" style="color: #dc3545; font-size: 12px; display: none; margin-top: 5px;"></span>
             </div>
-        </div>
-    </div>
 
+            <div class="grupo-campo">
+                <label>Teléfono</label>
+                <input type="text" id="telefono">
+                <span id="error-telefono" style="color: #dc3545; font-size: 12px; display: none; margin-top: 5px;"></span>
+            </div>
+
+            <div class="pie-modal">
+                <button type="button" class="boton boton-gris" onclick="cerrarModal()">Cancelar</button>
+                <button type="submit" class="boton boton-verde">Guardar</button>
+            </div>
+        </form>
+    </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded",function(){
+    document.addEventListener("DOMContentLoaded", function() {
         listarEditoriales();
     });
-    function listarEditoriales(){
-        fetch('/editoriales/listaeditoriales').then(response => response.json()).then(response => {
-            let table = document.getElementById('tableEditoriales');
-            //table.innerHTML=``;
-            //<td>${libro.editorial}</td>
-            response.data.forEach(editoriales => {
-                table.innerHTML += `
-                <tr>
-                    <td>${editoriales.id}</td>
-                    <td>${editoriales.nombre}</td>
-                    <td>${editoriales.direccion}</td>
-                    <td>${editoriales.telefono}</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm" onclick="editCategoria(${editoriales.id})">EDITAR</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteCategoria(${editoriales.id})">ELIMINAR</button>
-                    </td>
-                `;
-            })
-        })
+
+    function listarEditoriales() {
+        fetch('/editoriales/listar')
+            .then(res => res.json())
+            .then(res => {
+                let tabla = document.getElementById('tabla-editoriales');
+                tabla.innerHTML = '';
+                if(res.success && res.data) {
+                    res.data.forEach(ed => {
+                        tabla.innerHTML += `
+                        <tr>
+                            <td>${ed.id}</td>
+                            <td>${ed.nombre}</td>
+                            <td>${ed.direccion}</td>
+                            <td>${ed.telefono}</td>
+                            <td>
+                                <button class="boton boton-amarillo" onclick="editarEditorial(${ed.id}, '${ed.nombre}', '${ed.direccion}', '${ed.telefono}')">Editar</button>
+                                <button class="boton boton-rojo" onclick="eliminarEditorial(${ed.id})">Borrar</button>
+                            </td>
+                        </tr>
+                        `;
+                    });
+                }
+            });
     }
-    function abrirModal(){
-        limpiarFormulario();
-        document.getElementById(`tituloModal`).innerText=`Nueva Editorial`;
-    }
-    function limpiarFormulario(){
-        document.getElementById(`id`).value = ``;
-        document.getElementById(`nombre`).value = ``;
-        document.getElementById(`direccion`).value = ``;
-        document.getElementById(`telefono`).value = ``;
+
+    document.getElementById('form-editorial').addEventListener('submit', function(evento) {
+        evento.preventDefault();
+
         limpiarErrores();
+
+        let datos = {
+            id: document.getElementById('id-editorial').value || null,
+            nombre: document.getElementById('nombre').value,
+            direccion: document.getElementById('direccion').value,
+            telefono: document.getElementById('telefono').value
+        };
+
+        fetch('/editoriales/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datos)
+        })
+            .then(async response => {
+                const resData = await response.json();
+
+                if (response.ok) {
+                    cerrarModal();
+                    listarEditoriales();
+
+                    if (datos.id) {
+                        mostrarToast("Cambios guardados correctamente", "exito");
+                    } else {
+                        mostrarToast("Nueva editorial agregada con éxito", "exito");
+                    }
+
+                } else if (response.status === 400) {
+                    mostrarErroresCampos(resData.fieldErrors);
+                } else {
+                    mostrarToast(resData.message, "error");
+                }
+            })
+    });
+
+    function eliminarEditorial(id) {
+        if(confirm('¿Está seguro de eliminar esta editorial?')) {
+            fetch('/editoriales/eliminar/' + id, {
+                method: 'DELETE'
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        listarEditoriales();
+                        mostrarToast("Editorial eliminada del sistema", "exito");
+                    } else {
+                        mostrarToast(data.message, "error");
+                    }
+                });
+        }
+    }
+
+    // --- FUNCIONES DE INTERFAZ Y MODAL ---
+
+    function abrirModal() {
+        document.getElementById('id-editorial').value = '';
+        document.getElementById('nombre').value = '';
+        document.getElementById('direccion').value = '';
+        document.getElementById('telefono').value = '';
+        limpiarErrores();
+
+        document.getElementById('titulo-modal').innerText = 'Nueva Editorial';
+        document.getElementById('modal-editorial').style.display = 'flex';
+    }
+
+    function editarEditorial(id, nombre, direccion, telefono) {
+        document.getElementById('id-editorial').value = id;
+        document.getElementById('nombre').value = nombre;
+        document.getElementById('direccion').value = direccion;
+        document.getElementById('telefono').value = telefono;
+        limpiarErrores();
+
+        document.getElementById('titulo-modal').innerText = 'Editar Editorial';
+        document.getElementById('modal-editorial').style.display = 'flex';
+    }
+
+    function cerrarModal() {
+        document.getElementById('modal-editorial').style.display = 'none';
+    }
+
+    function limpiarErrores() {
+        // Oculta todos los span rojos
+        document.getElementById('error-nombre').style.display = 'none';
+        document.getElementById('error-direccion').style.display = 'none';
+        document.getElementById('error-telefono').style.display = 'none';
+    }
+
+    function mostrarErroresCampos(errores) {
+        // Si el backend mandó errores específicos, los inyecta en los span correspondientes
+        if(errores.nombre) {
+            let span = document.getElementById('error-nombre');
+            span.innerText = "✖ " + errores.nombre;
+            span.style.display = 'block';
+        }
+        if(errores.direccion) {
+            let span = document.getElementById('error-direccion');
+            span.innerText = "✖ " + errores.direccion;
+            span.style.display = 'block';
+        }
+        if(errores.telefono) {
+            let span = document.getElementById('error-telefono');
+            span.innerText = "✖ " + errores.telefono;
+            span.style.display = 'block';
+        }
+    }
+    // --- SISTEMA DE NOTIFICACIONES TOAST ---
+    function mostrarToast(mensaje, tipo = 'exito') {
+        // Busca si ya existe el contenedor, si no, lo crea
+        let contenedor = document.getElementById('contenedor-toast');
+        if (!contenedor) {
+            contenedor = document.createElement('div');
+            contenedor.id = 'contenedor-toast';
+            document.body.appendChild(contenedor);
+        }
+
+        // Crea la notificación
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${tipo}`;
+        toast.innerText = (tipo === 'exito' ? '✅ ' : '⚠️ ') + mensaje;
+
+        // La agrega a la pantalla
+        contenedor.appendChild(toast);
+
+        // La elimina del código después de 3 segundos para no acumular basura
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
     }
 </script>
 </body>

@@ -3,197 +3,266 @@
 <head>
     <meta charset="UTF-8">
     <title>Libros</title>
-    <link rel="stylesheet" href="resources/static/estilos.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/estilos.css}">
 </head>
 <body>
 
-<div class="container mt-5">
-
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Libros</h4>
-
-            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalNuevo">
-                Nuevo Libro
-            </button>
-        </div>
-
-        <div class="card-body">
-
-            <table class="table table-bordered table-hover align-middle">
-                <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Título</th>
-                    <th>Editorial</th>
-                    <th>Código ISBN</th>
-                    <th>Acciones</th>
-                </tr>
-                </thead>
-
-                <tbody id = "tableLibros">
-
-                </tbody>
-            </table>
-
-        </div>
+<nav class="barra-navegacion">
+    <a href="/" class="titulo-logo">Biblioteca</a>
+    <div>
+        <a href="/">Inicio</a>
+        <a href="/editoriales">Editoriales</a>
+        <a href="/libros">Libros</a>
     </div>
+</nav>
+
+<div class="contenedor">
+    <div class="cabecera-seccion">
+        <h2>Lista de Libros</h2>
+        <button class="boton boton-azul" onclick="abrirModal()">+ Nuevo Libro</button>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Editorial</th>
+            <th>ISBN</th>
+            <th>Año</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody id="tabla-libros"></tbody>
+    </table>
 </div>
 
-
-<div class="modal fade" id="modalNuevo" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <form th:action="@{/libros/save}" method="post">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">Nuevo Libro</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body">
-                    <label class="form-label">Titulo</label>
-                    <input type="text"
-                           name="titulo"
-                           class="form-control"
-                           placeholder="Ingrese el titulo" id="titulo" pattern="[A-Za-z]+" required>
-                </div>
-                <div class="modal-body">
-                    <label class="form-label">Codigo ISBN</label>
-                    <input type="text"
-                           name="codigoISBN"
-                           class="form-control"
-                           placeholder="Ingrese ISBN" id="codigo" pattern="[0-9]+" required>
-                </div>
-                <div class="modal-body">
-                    <label class="form-label">Año Publicación</label>
-                    <input type="text"
-                           name="anioPublicacion"
-                           class="form-control"
-                           placeholder="Ingrese año correcto" id="anio" pattern="[0-9]{4}+" required>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Cancelar
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        Guardar
-                    </button>
-                </div>
-            </form>
-
+<div class="fondo-modal" id="modal-libro">
+    <div class="caja-modal">
+        <div class="cabecera-modal">
+            <h3 id="titulo-modal">Nuevo Libro</h3>
+            <button class="boton-cerrar" onclick="cerrarModal()">X</button>
         </div>
-    </div>
-</div>
 
+        <form id="form-libro">
+            <input type="hidden" id="id-libro">
 
-<div th:each="lib : ${libs}">
-
-    <div class="modal fade" th:id="'modalEditar' + ${libs.id}" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-
-                <form th:action="@{/libros/save}" method="post">
-                    <div class="modal-header bg-warning">
-                        <h5 class="modal-title">Editar Libro</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <input type="hidden" name="id" th:value="${libs.id}">
-
-                        <label class="form-label">Titulo</label>
-                        <input type="text"
-                               name="titulo"
-                               class="form-control"
-                               th:value="${libs.titulo}"
-                               required>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Cancelar
-                        </button>
-                        <button type="submit" class="btn btn-warning">
-                            Actualizar
-                        </button>
-                    </div>
-                </form>
-
+            <div class="grupo-campo">
+                <label>Título</label>
+                <input type="text" id="titulo">
+                <span id="error-titulo" style="color: #dc3545; font-size: 12px; display: none; margin-top: 5px;"></span>
             </div>
-        </div>
-    </div>
 
-    <div class="modal fade" th:id="'modalEliminar' + ${libs.id}" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">Eliminar Libro</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body">
-                    <p>
-                        ¿Está seguro de eliminar el libro?
-                        <strong th:text="${libs.nombre}"></strong>?
-                    </p>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Cancelar
-                    </button>
-
-                    <a class="btn btn-danger"
-                       th:href="@{/libros/eliminar/{id}(id=${libs.id})}">
-                        Sí, eliminar
-                    </a>
-                </div>
-
+            <div class="grupo-campo">
+                <label>Código ISBN</label>
+                <input type="text" id="isbn" maxlength="13">
+                <span id="error-isbn" style="color: #dc3545; font-size: 12px; display: none; margin-top: 5px;"></span>
             </div>
-        </div>
-    </div>
 
+            <div class="grupo-campo">
+                <label>Año Publicación</label>
+                <input type="number" id="anio-publicacion">
+                <span id="error-anio" style="color: #dc3545; font-size: 12px; display: none; margin-top: 5px;"></span>
+            </div>
+
+            <div class="grupo-campo">
+                <label>Editorial</label>
+                <select id="select-editorial">
+                    <option value="">Seleccione una editorial...</option>
+                </select>
+                <span id="error-editorial" style="color: #dc3545; font-size: 12px; display: none; margin-top: 5px;"></span>
+            </div>
+
+            <div class="pie-modal">
+                <button type="button" class="boton boton-gris" onclick="cerrarModal()">Cancelar</button>
+                <button type="submit" class="boton boton-azul">Guardar</button>
+            </div>
+        </form>
+    </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded",function(){
+    document.addEventListener("DOMContentLoaded", function() {
         listarLibros();
+        cargarEditoriales();
     });
-    function listarLibros(){
-        fetch('/libros/listalibros').then(response => response.json()).then(response => {
-            let table = document.getElementById('tableLibros');
-            //table.innerHTML=``;
-            //<td>${libro.editorial}</td>
-            response.data.forEach(libro => {
-                table.innerHTML += `
-                <tr>
-                    <td>${libro.id}</td>
-                    <td>${libro.titulo}</td>
-                    <td>${libro.codigoISBN}</td>
-                    <td>${libro.anioPublicacion}</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm" onclick="editCategoria(${editoriales.id})">EDITAR</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteCategoria(${editoriales.id})">ELIMINAR</button>
-                    </td>
-                `;
-            })
-        })
+
+    function listarLibros() {
+        fetch('/libros/listar')
+            .then(res => res.json())
+            .then(res => {
+                let tabla = document.getElementById('tabla-libros');
+                tabla.innerHTML = '';
+                if(res.success && res.data) {
+                    res.data.forEach(libro => {
+                        let edNombre = libro.editorial ? libro.editorial.nombre : 'Sin editorial';
+                        let edId = libro.editorial ? libro.editorial.id : '';
+                        tabla.innerHTML += `
+                        <tr>
+                            <td>${libro.id}</td>
+                            <td>${libro.titulo}</td>
+                            <td>${edNombre}</td>
+                            <td>${libro.isbn}</td>
+                            <td>${libro.anio_publicacion}</td>
+                            <td>
+                                <button class="boton boton-amarillo" onclick="editarLibro(${libro.id}, '${libro.titulo}', '${libro.isbn}', ${libro.anio_publicacion}, '${edId}')">Editar</button>
+                                <button class="boton boton-rojo" onclick="eliminarLibro(${libro.id})">Borrar</button>
+                            </td>
+                        </tr>
+                        `;
+                    });
+                }
+            });
     }
-    function abrirModal(){
-        limpiarFormulario();
-        document.getElementById(`tituloModal`).innerText=`Nuevo Libro`;
+
+    function cargarEditoriales() {
+        fetch('/editoriales/listar')
+            .then(res => res.json())
+            .then(res => {
+                let select = document.getElementById('select-editorial');
+                if(res.success && res.data) {
+                    res.data.forEach(ed => {
+                        let opcion = document.createElement('option');
+                        opcion.value = ed.id;
+                        opcion.text = ed.nombre;
+                        select.appendChild(opcion);
+                    });
+                }
+            });
     }
-    function limpiarFormulario(){
-        document.getElementById(`id`).value = ``;
-        document.getElementById(`titulo`).value = ``;
-        document.getElementById(`codigoISBN`).value = ``;
-        document.getElementById(`anioPublicacion`).value = ``;
+
+    document.getElementById('form-libro').addEventListener('submit', function(evento) {
+        evento.preventDefault();
         limpiarErrores();
+
+        let idEditorialSeleccionada = document.getElementById('select-editorial').value;
+
+        let datos = {
+            id: document.getElementById('id-libro').value || null,
+            titulo: document.getElementById('titulo').value,
+            isbn: document.getElementById('isbn').value,
+            anio_publicacion: document.getElementById('anio-publicacion').value,
+            editorial: idEditorialSeleccionada ? { id: idEditorialSeleccionada } : null
+        };
+
+        fetch('/libros/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datos)
+        })
+            .then(async response => {
+                const resData = await response.json();
+
+                if (response.ok) {
+                    cerrarModal();
+                    listarLibros();
+                    if (datos.id) {
+                        mostrarToast("Libro actualizado correctamente", "exito");
+                    } else {
+                        mostrarToast("Nuevo libro agregado con éxito", "exito");
+                    }
+                } else if (response.status === 400) {
+                    mostrarErroresCampos(resData.fieldErrors);
+                } else {
+                    mostrarToast(resData.message, "error");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+    });
+
+    function eliminarLibro(id) {
+        if(confirm('¿Está seguro de eliminar este libro?')) {
+            fetch('/libros/eliminar/' + id, {
+                method: 'DELETE'
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        listarLibros();
+                        mostrarToast("Libro eliminado del sistema", "exito");
+                    } else {
+                        mostrarToast(data.message, "error");
+                    }
+                });
+        }
+    }
+
+    function abrirModal() {
+        document.getElementById('id-libro').value = '';
+        document.getElementById('titulo').value = '';
+        document.getElementById('isbn').value = '';
+        document.getElementById('anio-publicacion').value = '';
+        document.getElementById('select-editorial').value = '';
+        limpiarErrores();
+
+        document.getElementById('titulo-modal').innerText = 'Nuevo Libro';
+        document.getElementById('modal-libro').style.display = 'flex';
+    }
+
+    function editarLibro(id, titulo, isbn, anio, edId) {
+        document.getElementById('id-libro').value = id;
+        document.getElementById('titulo').value = titulo;
+        document.getElementById('isbn').value = isbn;
+        document.getElementById('anio-publicacion').value = anio;
+        document.getElementById('select-editorial').value = edId;
+        limpiarErrores();
+
+        document.getElementById('titulo-modal').innerText = 'Editar Libro';
+        document.getElementById('modal-libro').style.display = 'flex';
+    }
+
+    function cerrarModal() {
+        document.getElementById('modal-libro').style.display = 'none';
+    }
+
+    function limpiarErrores() {
+        document.getElementById('error-titulo').style.display = 'none';
+        document.getElementById('error-isbn').style.display = 'none';
+        document.getElementById('error-anio').style.display = 'none';
+        document.getElementById('error-editorial').style.display = 'none';
+    }
+
+    function mostrarErroresCampos(errores) {
+        if(errores.titulo) {
+            let span = document.getElementById('error-titulo');
+            span.innerText = "✖ " + errores.titulo;
+            span.style.display = 'block';
+        }
+        if(errores.isbn) {
+            let span = document.getElementById('error-isbn');
+            span.innerText = "✖ " + errores.isbn;
+            span.style.display = 'block';
+        }
+        if(errores.anio_publicacion) {
+            let span = document.getElementById('error-anio');
+            span.innerText = "✖ " + errores.anio_publicacion;
+            span.style.display = 'block';
+        }
+        if(errores.editorial || errores['editorial.id']) {
+            let span = document.getElementById('error-editorial');
+            span.innerText = "✖ " + (errores.editorial || errores['editorial.id']);
+            span.style.display = 'block';
+        }
+    }
+
+    // --- SISTEMA DE NOTIFICACIONES TOAST ---
+    function mostrarToast(mensaje, tipo = 'exito') {
+        let contenedor = document.getElementById('contenedor-toast');
+        if (!contenedor) {
+            contenedor = document.createElement('div');
+            contenedor.id = 'contenedor-toast';
+            document.body.appendChild(contenedor);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${tipo}`;
+        toast.innerText = (tipo === 'exito' ? '✅ ' : '⚠️ ') + mensaje;
+
+        contenedor.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
     }
 </script>
 </body>

@@ -3,20 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <title>Inicio</title>
-    <link rel="stylesheet" href="resources/static/estilos.css">
+    <link rel="stylesheet" th:href="@{/estilos.css}">
 </head>
 <body>
-<nav class="barranavegacion">
-    <div class="contenedorBarra">
-        <a class="" href="#">Biblioteca</a>
-        <div class="contenedorMenu" >
-            <div class="contenedorItem">
-                <a class="" href="/">Inicio</a>
-                <a class="" href="/editoriales">Editoriales</a>
-                <a class="" href="/libros">Libros</a>
-            </div>
-        </div>
+
+<nav class="barra-navegacion">
+    <a href="/" class="titulo-logo">Biblioteca</a>
+    <div>
+        <a href="/">Inicio</a>
+        <a href="/editoriales">Editoriales</a>
+        <a href="/libros">Libros</a>
     </div>
 </nav>
+
+<div class="contenedor centro">
+    <h1>Sistema de Gestión</h1>
+    <p>Seleccione el módulo al que desea ingresar.</p>
+
+    <div class="caja-tarjetas">
+        <div class="tarjeta">
+            <h3>Libros</h3>
+            <p>Gestione el catálogo de libros.</p>
+            <a href="/libros" class="boton boton-azul boton-ancho">Ir a Libros</a>
+        </div>
+
+        <div class="tarjeta">
+            <h3>Editoriales</h3>
+            <p>Gestione el registro de editoriales.</p>
+            <a href="/editoriales" class="boton boton-verde boton-ancho">Ir a Editoriales</a>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

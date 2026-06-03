@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LibroRepository extends CrudRepository<Libro,Long> {
-
 }
